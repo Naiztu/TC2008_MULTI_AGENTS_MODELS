@@ -7,9 +7,7 @@ from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 from mesa import Agent, Model
 import time
-import datetime
 import matplotlib.animation as animation
-import matplotlib.animation
 import matplotlib.pyplot as plt
 import matplotlib
 import pandas as pd
