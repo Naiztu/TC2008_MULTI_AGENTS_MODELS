@@ -29,6 +29,7 @@ def get_grid(model):
                 grid[x][y] = 1
     return grid
 
+
 '''
     Model RobotVacuumCleanerModel
 
@@ -48,13 +49,18 @@ def get_grid(model):
 
 
 '''
+
+
 class RobotVacuumCleanerModel(Model):
-    def __init__(self, width, height, num_agents, dirty_cells_percentage=0.5):
+    def __init__(self, width, height, num_agents, dirty_cells_percentage=0.5, flag = False, max_steps = 200):
         self.num_agents = num_agents
         self.dirty_cells_percentage = dirty_cells_percentage
         self.grid = MultiGrid(width, height, True)
         self.schedule = RandomActivation(self)
         self.floor = np.zeros((width, height))
+        self.max_steps = max_steps
+        self.flag = flag
+        self.current_step = 0
 
         for i in range(self.num_agents):
             a = RobotVacuumCleanerAgent(i, self)
@@ -73,18 +79,28 @@ class RobotVacuumCleanerModel(Model):
 
         self.datacollector = DataCollector(model_reporters={"Grid": get_grid})
 
-    def is_all_clean(self):
-        return np.all(self.floor == 0)
+    def is_finalized(self):
+        is_clean = np.all(self.floor == 0)
+
+        if self.flag:
+            return is_clean
+        
+        return self.current_step >= self.max_steps or is_clean
+
 
     def get_info(self):
+        print("Number of model steps: ", self.current_step)
         print("Number of agents: ", self.num_agents)
-        print("Dirty cells percentage: ", self.dirty_cells_percentage)
+        print("Dirty cells percentage: ", round(
+            self.dirty_cells_percentage, 2))
         print("Grid size: ", self.grid.width, "x", self.grid.height)
         for agent in self.schedule.agents:
             print("Agent", agent.unique_id, "moviments: ", agent.moviments)
+
 
     def step(self):
         self.datacollector.collect(self)
         self.schedule.step()
         self.dirty_cells_percentage = np.count_nonzero(
             self.floor) / (self.grid.width * self.grid.height)
+        self.current_step += 1

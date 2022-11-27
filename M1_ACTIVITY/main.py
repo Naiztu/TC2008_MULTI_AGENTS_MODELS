@@ -15,24 +15,25 @@ import time
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
-WIDTH_GRID = 10
-HEIGHT_GRID = 10
-NUM_ROBOTS = 5
-DIRTY_CELLS_PERCENTAGE = 0.3
-TIME_MAX = 0.04
+WIDTH_GRID = 20  # Width of the grid
+HEIGHT_GRID = 30  # Height of the grid
+NUM_ROBOTS = 10  # Number of robots
+DIRTY_CELLS_PERCENTAGE = 0.5  # Percentage of dirty cells in the grid
+MAX_STEPS = 200  # Time of execution maximum in seconds
+FLAG_FINALIZED = False # Flag of the simulation is will finished completely
+
 start_time = time.time()
 model = RobotVacuumCleanerModel(
-    HEIGHT_GRID, WIDTH_GRID, NUM_ROBOTS, DIRTY_CELLS_PERCENTAGE)
+    HEIGHT_GRID, WIDTH_GRID, NUM_ROBOTS, DIRTY_CELLS_PERCENTAGE, FLAG_FINALIZED, MAX_STEPS)
 
-time_execution = 0
-
-while not model.is_all_clean() and time_execution < TIME_MAX:
+while not model.is_finalized():
     model.step()
-    time_execution =  time.time() - start_time
+
+
+time_execution = time.time() - start_time
 
 model.get_info()
-print("Time of execution: ", time_execution)
-
+print("Time of execution: %s seconds" % round(time_execution, 2))
 
 all_grids = model.datacollector.get_model_vars_dataframe()
 fig, axs = plt.subplots(figsize=(7, 7))
@@ -48,4 +49,3 @@ def animate(i):
 anim = animation.FuncAnimation(
     fig, animate, frames=len(all_grids), interval=100)
 anim.save('Animation.gif', writer='imagemagick', fps=10)
-
