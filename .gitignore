@@ -1,2 +1,4 @@
 *.gif
+*.pdf
+*.docx
 __pycache__
