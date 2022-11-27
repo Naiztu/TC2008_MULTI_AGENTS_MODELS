@@ -52,7 +52,7 @@ def get_grid(model):
 
 
 class RobotVacuumCleanerModel(Model):
-    def __init__(self, width, height, num_agents, dirty_cells_percentage=0.5, flag = False, max_steps = 200):
+    def __init__(self, width, height, num_agents, dirty_cells_percentage=0.5, flag=False, max_steps=200):
         self.num_agents = num_agents
         self.dirty_cells_percentage = dirty_cells_percentage
         self.grid = MultiGrid(width, height, True)
@@ -84,9 +84,8 @@ class RobotVacuumCleanerModel(Model):
 
         if self.flag:
             return is_clean
-        
-        return self.current_step >= self.max_steps or is_clean
 
+        return self.current_step >= self.max_steps or is_clean
 
     def get_info(self):
         print("Number of model steps: ", self.current_step)
@@ -94,9 +93,11 @@ class RobotVacuumCleanerModel(Model):
         print("Dirty cells percentage: ", round(
             self.dirty_cells_percentage, 2))
         print("Grid size: ", self.grid.width, "x", self.grid.height)
+        acum = 0
         for agent in self.schedule.agents:
             print("Agent", agent.unique_id, "moviments: ", agent.moviments)
-
+            acum += agent.moviments
+        print("Average moviments: ", round(acum / self.num_agents, 2))
 
     def step(self):
         self.datacollector.collect(self)
